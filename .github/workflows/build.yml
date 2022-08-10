@@ -35,9 +35,13 @@ jobs:
         sed -i -E "s/serverVersion=(.+)/serverVersion=${{ env.SERVER_VERSION }}/g" src/main/resources/config.properties
         ./gradlew clean buildPlugin
 
-    - name: Push to Coding Artifacts
-      run: |
-        cd build/distributions/
-        PLUGIN_ZIP=$(ls | grep nocalhost-intellij-plugin-)
-        PLUGIN_VERSION="$(git rev-parse --short HEAD)-${{ matrix.platform-version }}"
-        curl -T ${PLUGIN_ZIP} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/plugins/nocalhost-intellij-plugin.zip?version=${PLUGIN_VERSION}"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: my-artifact
+        path: build/distributions/
+#    - name: Push to Coding Artifacts
+#      run: |
+#        cd build/distributions/
+#        PLUGIN_ZIP=$(ls | grep nocalhost-intellij-plugin-)
+#        PLUGIN_VERSION="$(git rev-parse --short HEAD)-${{ matrix.platform-version }}"
+#        curl -T ${PLUGIN_ZIP} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/plugins/nocalhost-intellij-plugin.zip?version=${PLUGIN_VERSION}"
