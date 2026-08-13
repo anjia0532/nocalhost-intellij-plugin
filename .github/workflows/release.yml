@@ -43,6 +43,7 @@ jobs:
             java-version: 25
     env:
       ORG_GRADLE_PROJECT_platformVersion: ${{ matrix.platform-version }}
+      JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}
 
     steps:
     - uses: actions/checkout@v2
@@ -61,14 +62,16 @@ jobs:
         echo "SERVER_VERSION=${{ secrets.MINIMUNM_VERSION_REQUIREMENT }}" | sed 's/v//g' >> $GITHUB_ENV
 
     - name: Build
-      env:
-        JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}
       run: |
         sed -i "s/sentryDsn=/sentryDsn=${{secrets.INTELLIJ_PLUGIN_SENTRY_DSN}}/g" src/main/resources/config.properties
         sed -i -E "s/nhctlVersion=(.+)/nhctlVersion=${{ env.NHCTL_VERSION }}/g" src/main/resources/config.properties
         sed -i -E "s/serverVersion=(.+)/serverVersion=${{ env.SERVER_VERSION }}/g" src/main/resources/config.properties
         sed -i -E "s/version=(.+)/version=${{ env.PLUGIN_VERSION }}/g" gradle.properties
-        ./gradlew clean publishPlugin
+        ./gradlew clean buildPlugin
+
+    - name: Publish to JetBrains Marketplace
+      if: ${{ env.JETBRAINS_TOKEN != '' }}
+      run: ./gradlew publishPlugin
 
     - name: Rename package
       run: |
