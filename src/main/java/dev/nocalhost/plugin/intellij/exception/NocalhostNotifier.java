@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.event.HyperlinkEvent;
 
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.topic.NocalhostExceptionPrintNotifier;
 import icons.NocalhostIcons;
 
@@ -64,7 +65,7 @@ public class NocalhostNotifier {
     public Notification notifyError(@NlsContexts.NotificationTitle @NotNull String title,
                                     @NlsContexts.NotificationContent @NotNull String message,
                                     @NotNull String eMessage) {
-        String content = String.format("<html>%s <a href=\"nocalhost.show\">Show More</a></html>", message);
+        String content = String.format("<html>%s <a href=\"nocalhost.show\">%s</a></html>", message, NocalhostI18n.get("notify.showMore"));
         return notify(NOCALHOST_ERROR_NOTIFICATION, NOCALHOST_ERROR_NOTIFICATION_ID, title, content, NotificationType.ERROR, new AnAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -77,7 +78,7 @@ public class NocalhostNotifier {
     }
 
     public void notifyBinaryNotFound(String binary) {
-        String content = String.format("<html>%s binary not found. <a href=\"nocalhost.setting\">Setting</a></html>", binary);
+        String content = NocalhostI18n.format("notify.binaryNotFound", binary);
         notify(NOCALHOST_ERROR_NOTIFICATION, NOCALHOST_ERROR_NOTIFICATION_ID, "Nocalhost", content, NotificationType.ERROR, new AnAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
@@ -88,7 +89,7 @@ public class NocalhostNotifier {
     }
 
     public void notifyVersionTips() {
-        String content = "<html>nocalhost plugin need upgrade. <a href=\"nocalhost.setting\">upgrade plugin</a></html>";
+        String content = NocalhostI18n.get("notify.versionTips");
         notify(NOCALHOST_ERROR_NOTIFICATION, NOCALHOST_ERROR_NOTIFICATION_ID, "Nocalhost", content, NotificationType.ERROR, new AnAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent anActionEvent) {

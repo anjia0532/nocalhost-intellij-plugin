@@ -40,6 +40,7 @@ import dev.nocalhost.plugin.intellij.configuration.php.NocalhostPhpConfiguration
 import dev.nocalhost.plugin.intellij.configuration.python.NocalhostPythonConfiguration;
 import dev.nocalhost.plugin.intellij.configuration.python.NocalhostPythonConfigurationType;
 import dev.nocalhost.plugin.intellij.exception.NocalhostExecuteCmdException;
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.nhctl.NhctlDevAssociateCommand;
 import dev.nocalhost.plugin.intellij.service.NocalhostContextManager;
 import dev.nocalhost.plugin.intellij.settings.data.DevModeService;
@@ -77,7 +78,7 @@ public class ExecutionTask extends Task.Backgroundable {
     };
 
     public ExecutionTask(Project project, DevModeService service, String action) {
-        super(project, String.format("Starting `%s`", action), true);
+        super(project, NocalhostI18n.format("progress.starting", action), true);
         this.action = action;
         this.project = project;
         this.service = service;
@@ -85,8 +86,8 @@ public class ExecutionTask extends Task.Backgroundable {
 
     @Override
     public void onThrowable(@NotNull Throwable ex) {
-        ErrorUtil.dealWith(this.getProject(), "Failed to start " + action,
-                String.format("Error occurred while starting `%s`", action), ex);
+        ErrorUtil.dealWith(this.getProject(), NocalhostI18n.format("error.startAction", action),
+                NocalhostI18n.format("error.startAction.content", action), ex);
     }
 
     @Override
@@ -161,7 +162,7 @@ public class ExecutionTask extends Task.Backgroundable {
         if (conf.getType() instanceof NocalhostPythonConfigurationType) {
             var port = getDebugPort();
             if (StringUtils.isEmpty(port)) {
-                throw new ExecutionException("The remote debug port is not configured.");
+                throw new ExecutionException(NocalhostI18n.get("error.theRemoteDebugPortNotConfigured"));
             }
             var pyconf = (NocalhostPythonConfiguration) conf.getConfiguration();
             pyconf.setPort(port);
@@ -194,7 +195,7 @@ public class ExecutionTask extends Task.Backgroundable {
             if (StringUtils.isNotEmpty(lang)) {
                 var conf = lang2conf.getOrDefault(lang, null);
                 if (conf == null) {
-                    throw new ExecutionException(String.format("Failed to create configuration, language: %s.", lang));
+                    throw new ExecutionException(NocalhostI18n.format("error.createConfigurationLanguage", lang));
                 }
                 return conf;
             }
@@ -202,7 +203,7 @@ public class ExecutionTask extends Task.Backgroundable {
         var code = ApplicationInfo.getInstance().getBuild().getProductCode();
         var conf = code2conf.getOrDefault(code, null);
         if (conf == null) {
-            throw new ExecutionException(String.format("Failed to create configuration, IDE: %s.", code));
+            throw new ExecutionException(NocalhostI18n.format("error.createConfigurationIde", code));
         }
         return conf;
     }
@@ -216,7 +217,7 @@ public class ExecutionTask extends Task.Backgroundable {
                 // ignore
             }
         }
-        throw new ExecutionException("Cannot resolve remoteDebugPort.");
+        throw new ExecutionException(NocalhostI18n.get("error.resolveRemoteDebugPort"));
     }
 
     private void associate(String path) throws IOException, NocalhostExecuteCmdException, InterruptedException {

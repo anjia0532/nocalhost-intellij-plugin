@@ -39,6 +39,7 @@ import dev.nocalhost.plugin.intellij.commands.data.ServiceContainer;
 import dev.nocalhost.plugin.intellij.configuration.php.NocalhostPhpDebugRunner;
 import dev.nocalhost.plugin.intellij.data.NocalhostContext;
 import dev.nocalhost.plugin.intellij.exception.NocalhostExecuteCmdException;
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.service.NocalhostContextManager;
 import dev.nocalhost.plugin.intellij.topic.NocalhostOutputAppendNotifier;
 import dev.nocalhost.plugin.intellij.utils.DataUtils;
@@ -63,7 +64,7 @@ public class NocalhostProfileState extends CommandLineState {
     protected @NotNull ProcessHandler startProcess() throws ExecutionException {
         NocalhostRunnerContext dev = refContext.get();
         if (dev == null) {
-            throw new ExecutionException("Call prepare() before this method");
+            throw new ExecutionException(NocalhostI18n.get("error.callPrepareFirst"));
         }
         NocalhostContext context = dev.getContext();
 
@@ -96,18 +97,18 @@ public class NocalhostProfileState extends CommandLineState {
             var project = getEnvironment().getProject();
             var context = NocalhostContextManager.getInstance(project).getContext();
             if (context == null) {
-                throw new ExecutionException("Nocalhost context is null.");
+                throw new ExecutionException(NocalhostI18n.get("error.contextNull"));
             }
 
             var desService = NhctlUtil.getDescribeService(project, context);
             if ( ! NhctlDescribeServiceUtil.developStarted(desService)) {
-                throw new ExecutionException("Service is not in dev mode.");
+                throw new ExecutionException(NocalhostI18n.get("error.serviceNotInDevMode"));
             }
             if ( ! isProjectPathMatched(desService)) {
-                throw new ExecutionException("Project path does not match.");
+                throw new ExecutionException(NocalhostI18n.get("error.projectPathNotMatch"));
             }
             if ( ! isSyncStatusIdle()) {
-                throw new ExecutionException("File sync has not yet completed.");
+                throw new ExecutionException(NocalhostI18n.get("error.fileSyncNotCompleted"));
             }
 
             NhctlRawConfig devConfig = NhctlUtil.getDevConfig(context);
@@ -122,14 +123,14 @@ public class NocalhostProfileState extends CommandLineState {
                 }
             }
             if (container == null) {
-                throw new ExecutionException("Service container config not found.");
+                throw new ExecutionException(NocalhostI18n.get("error.containerConfigNotFound"));
             }
 
             NocalhostRunnerContext.Debug debug = null;
             NocalhostRunnerContext.Command command = new NocalhostRunnerContext.Command(resolveRunCommand(container), resolveDebugCommand(container));
             if (isDebugExecutor()) {
                 if (!StringUtils.isNotEmpty(command.getDebug())) {
-                    throw new ExecutionException("Debug command not configured");
+                    throw new ExecutionException(NocalhostI18n.get("error.debugCommandNotConfigured"));
                 }
 
                 String runnerId = getEnvironment().getRunner().getRunnerId();
@@ -139,14 +140,14 @@ public class NocalhostProfileState extends CommandLineState {
                 } else {
                     String remotePort = resolveDebugPort(container);
                     if (!StringUtils.isNotEmpty(remotePort)) {
-                        throw new ExecutionException("Remote debug port not configured.");
+                        throw new ExecutionException(NocalhostI18n.get("error.remoteDebugPortNotConfigured"));
                     }
                     String localPort = startDebugPortForward(context, remotePort);
                     debug = new NocalhostRunnerContext.Debug(remotePort, localPort);
                 }
             } else {
                 if (!StringUtils.isNotEmpty(command.getRun())) {
-                    throw new ExecutionException("Run command not configured");
+                    throw new ExecutionException(NocalhostI18n.get("error.runCommandNotConfigured"));
                 }
             }
 
@@ -313,7 +314,7 @@ public class NocalhostProfileState extends CommandLineState {
     public void startup() throws ExecutionException {
         var dev = refContext.get();
         if (dev == null) {
-            throw new ExecutionException("Call prepare() before this method");
+            throw new ExecutionException(NocalhostI18n.get("error.callPrepareFirst"));
         }
         if (dev.getContainer().getDev().isHotReload()) {
             disposables.add(new HotReload(getEnvironment()).withExec());

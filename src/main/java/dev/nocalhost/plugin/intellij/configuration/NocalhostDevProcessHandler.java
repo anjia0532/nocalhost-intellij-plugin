@@ -9,6 +9,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.execution.ui.RunContentDescriptor;
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.utils.ErrorUtil;
 import com.intellij.execution.ui.RunContentManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -20,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.MessageFormat;
 
 public class NocalhostDevProcessHandler extends KillableProcessHandler {
     private static final Logger LOG = Logger.getInstance(NocalhostDevProcessHandler.class);
@@ -75,7 +75,7 @@ public class NocalhostDevProcessHandler extends KillableProcessHandler {
 
     @Override
     protected void notifyProcessTerminated(int exitCode) {
-        print(MessageFormat.format("\nProcess finished with exit code {0}.", exitCode),
+        print("\n" + NocalhostI18n.format("process.finished", exitCode),
                 ConsoleViewContentType.SYSTEM_OUTPUT);
 
         super.notifyProcessTerminated(exitCode);

@@ -16,6 +16,8 @@ import com.intellij.xdebugger.XDebuggerManager;
 
 import org.jetbrains.annotations.NotNull;
 
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -76,7 +78,7 @@ public class NocalhostPythonDebugRunner implements ProgramRunner<RunnerSettings>
         try {
             return dev.getContainer().getDev().getWorkDir();
         } catch (Exception ex) {
-            throw new Exception("Please check your dev config.");
+            throw new Exception(NocalhostI18n.get("error.checkDevConfig"));
         }
     }
 }

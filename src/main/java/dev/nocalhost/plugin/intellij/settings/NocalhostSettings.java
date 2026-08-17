@@ -36,6 +36,12 @@ public class NocalhostSettings implements PersistentStateComponent<NocalhostSett
     private String standaloneClustersJson;
     private String nocalhostAccountsJson;
 
+    /**
+     * UI language for Nocalhost's own prompts, one of {@code en} / {@code zh}.
+     * Kubernetes resource terms (Deployment, CronJob, ...) are never translated.
+     */
+    private String language = "en";
+
     private Map<String, String> hash = Maps.newHashMap();
     private Map<String, String> devModeProjectPathServiceMap = Maps.newHashMap();
 

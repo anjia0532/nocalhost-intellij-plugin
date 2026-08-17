@@ -28,6 +28,7 @@ import dev.nocalhost.plugin.intellij.commands.NhctlCommand;
 import dev.nocalhost.plugin.intellij.exception.NocalhostExecuteCmdException;
 import dev.nocalhost.plugin.intellij.exception.NocalhostUnsupportedCpuArchitectureException;
 import dev.nocalhost.plugin.intellij.exception.NocalhostUnsupportedOperatingSystemException;
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.settings.NocalhostSettings;
 import dev.nocalhost.plugin.intellij.utils.NhctlUtil;
 import okhttp3.OkHttpClient;
@@ -74,7 +75,7 @@ public class NocalhostBinService {
         }
 
         if (shouldDownload) {
-            tryDownload(nhctlVersion, "Download Nocalhost Command Tool");
+            tryDownload(nhctlVersion, NocalhostI18n.get("progress.downloadNhctl"));
         }
     }
 
@@ -92,10 +93,10 @@ public class NocalhostBinService {
             Version requiredVersion = Version.valueOf(nhctlVersion);
             int compare = currentVersion.compareTo(requiredVersion);
             if (compare < 0) {
-                tryDownload(nhctlVersion, "Upgrade Nocalhost Command Tool");
+                tryDownload(nhctlVersion, NocalhostI18n.get("progress.upgradeNhctl"));
             }
         } catch (InterruptedException | NocalhostExecuteCmdException | IOException e) {
-            Messages.showErrorDialog(e.getMessage(), "Get nhctl Version Error");
+            Messages.showErrorDialog(e.getMessage(), NocalhostI18n.get("error.getNhctlVersion"));
         }
     }
 
@@ -112,7 +113,7 @@ public class NocalhostBinService {
         if (triedCoding && triedCoding && downloadException != null) {
             final Exception finalDownloadException = downloadException;
             ApplicationManager.getApplication().invokeLater(() ->
-                    Messages.showErrorDialog(finalDownloadException.getMessage(), "Download nhctl Error"));
+                    Messages.showErrorDialog(finalDownloadException.getMessage(), NocalhostI18n.get("error.downloadNhctl")));
         }
     }
 
@@ -151,8 +152,8 @@ public class NocalhostBinService {
             return;
         }
 
-        indicator.setText(String.format("downloading %s v%s", downloadFilename, version));
-        indicator.setText2(String.format("from " + url.host()));
+        indicator.setText(NocalhostI18n.format("progress.downloading", downloadFilename, version));
+        indicator.setText2(NocalhostI18n.get("common.from") + " " + url.host());
 
         Files.createDirectories(binDir);
 

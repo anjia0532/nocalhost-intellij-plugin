@@ -13,8 +13,7 @@ import com.intellij.python.pro.debugger.remote.PyRemoteDebugCommandLineState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.MessageFormat;
-
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.utils.ErrorUtil;
 import lombok.SneakyThrows;
 
@@ -48,7 +47,7 @@ public class NocalhostPythonDevProcessHandler extends PyRemoteDebugCommandLineSt
 
     @Override
     protected void notifyProcessTerminated(int exitCode) {
-        print(MessageFormat.format("\\nProcess finished with exit code {0}.", exitCode),
+        print("\\n" + NocalhostI18n.format("process.finished", exitCode),
                 ConsoleViewContentType.SYSTEM_OUTPUT);
 
         super.notifyProcessTerminated(exitCode);

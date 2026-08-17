@@ -11,15 +11,28 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import dev.nocalhost.plugin.intellij.i18n.NocalhostI18n;
 import dev.nocalhost.plugin.intellij.settings.NocalhostSettings;
+import dev.nocalhost.plugin.intellij.topic.NocalhostI18nChangedNotifier;
 
 public class ApplicationSettingsConfigurable implements SearchableConfigurable {
+    private static final String[] LANGUAGES = {NocalhostI18n.LANG_EN, NocalhostI18n.LANG_ZH};
+
     private static NocalhostSettings settings = ApplicationManager.getApplication().getService(NocalhostSettings.class);
     private JPanel panel;
     private JCheckBox checkNhctlVersion;
+    private JLabel checkNhctlVersionDescription;
+    private JComboBox<String> languageComboBox;
+    private JLabel languageLabel;
 
     public ApplicationSettingsConfigurable() {
         checkNhctlVersion.setSelected(settings.getCheckNhctlVersion());
+        String current = NocalhostI18n.getLanguage();
+        languageComboBox.setSelectedIndex(current.equals(NocalhostI18n.LANG_ZH) ? 1 : 0);
+        // Keep the combo itself localized so it always offers the two supported languages.
+        languageLabel.setText(NocalhostI18n.get("settings.language"));
+        checkNhctlVersion.setText(NocalhostI18n.get("settings.checkNhctlVersion"));
+        checkNhctlVersionDescription.setText(NocalhostI18n.get("settings.checkNhctlVersion.description"));
     }
 
     @Override
@@ -39,11 +52,28 @@ public class ApplicationSettingsConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        return settings.getCheckNhctlVersion() != checkNhctlVersion.isSelected();
+        return settings.getCheckNhctlVersion() != checkNhctlVersion.isSelected()
+                || !LANGUAGES[languageComboBox.getSelectedIndex()].equals(settings.getLanguage());
     }
 
     @Override
     public void apply() throws ConfigurationException {
         settings.setCheckNhctlVersion(checkNhctlVersion.isSelected());
+        String language = LANGUAGES[languageComboBox.getSelectedIndex()];
+        if (!language.equals(settings.getLanguage())) {
+            settings.setLanguage(language);
+            // Invalidate i18n cache so the new language takes effect immediately.
+            NocalhostI18n.refresh();
+            // Notify the tool window / status bar to re-render right away.
+            ApplicationManager.getApplication().getMessageBus().syncPublisher(
+                    NocalhostI18nChangedNotifier.NOCALHOST_I18N_CHANGED_NOTIFIER_TOPIC).action();
+        }
+    }
+
+    @Override
+    public void reset() {
+        checkNhctlVersion.setSelected(settings.getCheckNhctlVersion());
+        languageComboBox.setSelectedIndex(
+                NocalhostI18n.LANG_ZH.equals(settings.getLanguage()) ? 1 : 0);
     }
 }
